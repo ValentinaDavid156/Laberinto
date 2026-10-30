@@ -9,5 +9,6 @@
 
 ## Estado de esta funcionalidad
 
-- La búsqueda y sus pruebas todavía no se han añadido; no se declara implementada ni validada.
-- Comandos pendientes tras su implementación: `.venv\Scripts\python.exe -m pytest tests\test_fantasma_ia.py -q` y `.venv\Scripts\python.exe -m pytest -q --cov=laberinto --cov=fantasma_ia --cov-report=term-missing`.
+- Comando rojo: `.venv\Scripts\python.exe -m pytest tests\test_fantasma_ia.py -q`.
+- Resultado real antes de crear `fantasma_ia.py`: **5 failed in 0.18s**, todos con `ModuleNotFoundError: No module named 'fantasma_ia'`. Es el fallo esperado de TDD.
+- En la entrega de pruebas, `fantasma_ia.py` aún no forma parte del historial; queda registrada la falla inicial previa a su implementación.
