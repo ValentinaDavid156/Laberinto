@@ -2,7 +2,7 @@
 
 **Identificador**: 006-reproducir-traza
 **Creada**: 2026-10-17
-**Estado**: Descompuesta para revisión; no implementada.
+**Estado**: Implementada; pendiente de integración en la aplicación.
 **Fuente**: [SPEC-LAB-001 v1.3](../../base/SPEC.md), idéntica al adjunto analizado.
 **Gobierno**: [Constitución 1.0.0](../../.specify/memory/constitution.md).
 
@@ -24,7 +24,7 @@ realizan cuando estén disponibles los consumidores correspondientes.
 
 - Salto desde pausa, salto al final, pasos repetidos al terminar y cambio de velocidad durante pausa.
 - Traza de origen igual a destino y pila de profundidad 225.
-- Hay una contradicción temporal pendiente: mínimo de 30 ms por evento y duración máxima aproximada de cuatro segundos no son compatibles con trazas largas.
+- Decisión del proyecto: cada evento dura `max(0.03, 4/eventos)` segundos, sin límite total; S completa la traza.
 
 ## Requisitos
 
