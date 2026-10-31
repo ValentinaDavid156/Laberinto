@@ -2,7 +2,7 @@
 
 **Identificador**: 008-interfaz-ejecucion
 **Creada**: 2026-10-17
-**Estado**: Descompuesta para revisión; no implementada.
+**Estado**: Implementada conforme a las decisiones del proyecto; juego abierto para prueba manual.
 **Fuente**: [SPEC-LAB-001 v1.3](../../base/SPEC.md), idéntica al adjunto analizado.
 **Gobierno**: [Constitución 1.0.0](../../.specify/memory/constitution.md).
 
@@ -17,21 +17,21 @@ Como jugador quiero ejecutar el juego, configurar una partida y navegar entre in
 las dependencias; para la vista, una demostración visual aislada. Las pruebas integradas se
 realizan cuando estén disponibles los consumidores correspondientes.
 
-1. Dado el menú, cuando alterno G/V y comienzo con ENTER, entonces se crea la partida con esas opciones y se muestra su origen y estado.
+1. Dado el menú, cuando alterno V y comienzo con ENTER, entonces se crea la partida con el visualizador elegido y el mapa fijo número 4.
 2. Dada una partida finalizada, cuando pulso R, entonces comienza otra en el mismo modo; cuando vuelvo al menú, entonces puedo comenzar una nueva o salir.
 
 ### Casos límite
 
 - Cerrar la ventana durante dado, aparición, búsqueda pausada y movimiento.
 - Semilla no entera: rechazar el argumento con mensaje claro y sin iniciar una partida.
-- ESC en pantallas finales: §6.5 dice salir, pero §10.4 y §11 dicen menú; requiere confirmación antes de implementar esa navegación.
+- Decisión del proyecto: ESC tras victoria o derrota vuelve al menú, como indican §10.4 y §11.
 
 ## Requisitos
 
 ### Requisitos funcionales
 
-- **RF-01**: Se DEBE ofrecer menú con título y textos exactos de §10.1, modo generado y visualizador activado por defecto, sin vista previa.
-- **RF-02**: Se DEBE si no hay catálogo válido, impedir alternar G y mostrar en rojo: No se pudo leer laberintos.json: se usarán laberintos generados.
+- **RF-01**: Se DEBE ofrecer el título, estado del visualizador (activado por defecto), mapa fijo número 4 y controles para comenzar o salir; sin vista previa.
+- **RF-02**: Se DEBE usar el laberinto 4 del catálogo. El selector G y el modo generado están fuera de alcance porque no se implementa la spec 002.
 - **RF-03**: Se DEBE interpretar controles según §10.4; ignorar los ajenos al estado, cerrar inmediatamente con X y abandonar al menú con ESC durante partida.
 - **RF-04**: Se DEBE mostrar turno, estado, origen del laberinto y últimos dados separados por actor; dado de 60×60, borde de 3 y puntos negros, con animación de 003.
 - **RF-05**: Se DEBE mostrar capa negra alfa 160 con ¡HAS GANADO! verde o GAME OVER rojo a 64 px, subtítulo e instrucciones R/M/ESC.
@@ -68,7 +68,7 @@ Integra funcionalidades anteriores, sin redefinir algoritmos ni añadir sonido, 
 - [006-reproducir-traza](../006-reproducir-traza/spec.md).
 - [007-tablero-visualizador](../007-tablero-visualizador/spec.md).
 
-La cadena GAME OVER se conserva como requisito explícito. El historial menciona §19 pero el archivo termina en §18; la definición verificable de terminado se toma de la constitución. El criterio manual no se sustituye por pytest.
+La cadena GAME OVER se conserva como requisito explícito. Se usan las decisiones del proyecto: mapa fijo 4, sin implementar la spec 002 y ESC tras el final vuelve al menú. El historial menciona §19 pero el archivo termina en §18; la definición verificable de terminado se toma de la constitución. El criterio manual no se sustituye por pytest.
 
 ## Referencia y límites de esta división
 

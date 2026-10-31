@@ -56,18 +56,12 @@ esperar a 005. No es una instrucción para iniciar varias fases automáticamente
 | §17: declaración de ausencia de dudas | Revisada: las contradicciones reales se enumeran abajo |
 | §18: HTML de referencia | 008; la especificación prevalece sobre el prototipo |
 
-## Decisiones necesarias antes de planificar el aspecto afectado
+## Decisiones aplicadas al proyecto
 
-1. **Duración de la reproducción (006):** la fórmula `max(0.03, 4/eventos)` no permite
-   un máximo de cuatro segundos con cientos de eventos. Con 449 eventos dura 13,47 s.
-   Elegir entre mantener el mínimo de 30 ms, el límite total o agrupar eventos. Ninguna
-   alternativa se ha aprobado ni implementado en esta descomposición.
-2. **ESC tras victoria/derrota (008):** §6.5 indica salir; §10.4 y §11 indican volver al
-   menú. Es necesario confirmar qué regla prevalece. Durante partida y desde inicio no
-   existe contradicción: volver al menú y salir, respectivamente.
-3. **Un solo predefinido válido (002):** ignorar entradas inválidas puede dejar una única
-   opción, incompatible con no repetir inmediatamente. Confirmar si se permite repetir
-   o si se pasa al modo generado. Con cero válidos el respaldo ya está especificado.
+1. **Duración de la reproducción (006):** cada evento dura
+   `max(0.03, 4/eventos)` segundos, sin límite total; S completa la traza.
+2. **ESC tras victoria/derrota (008):** vuelve al menú.
+3. **Mapas (002/008):** no se implementa la spec 002; se juega con el laberinto fijo 4.
 
 ## Aclaraciones aplicadas sin ampliar el producto
 
@@ -84,13 +78,8 @@ esperar a 005. No es una instrucción para iniciar varias fases automáticamente
 - base/ permanece como referencia intacta; el destino de datos y del generador reutilizable
   se concreta al planificar, sin incorporar dependencias para exportar PNG al juego.
 
-## Estado y siguiente paso
+## Estado
 
-La revisión documental comprobó la asignación de los 27 CA, los límites, las dependencias y
-la conservación de la fuente. No se ejecutaron pruebas del juego: todavía no está implementado.
-Las revisiones de 002, 006 y 008 conservan pendiente el aspecto contradictorio correspondiente.
-Antes de planificar esas funcionalidades se deben resolver las decisiones anteriores.
-
-Para la siguiente fase se debe elegir una carpeta y hacer que Spec Kit la use como funcionalidad
-activa; no se debe volver a especificar el juego completo. Se mantiene la obligación de revisar
-Git, sincronizar antes de comenzar y realizar commit y push al terminar cada fase.
+Las ocho specs fueron revisadas y se están implementando por bloques con sus propios
+`tasks.md` y `validacion.md`. La lógica y el tablero ya están implementados; la integración
+de menú, ejecución y documentación está en curso. `base/` y `laberinto.py` permanecen intactos.

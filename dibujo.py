@@ -24,12 +24,44 @@ def bloques_visibles(pila):
 
 
 def dibujar(superficie, partida, reproductor=None, dado_jugador=None,
-            dado_fantasma=None, mensaje="", tiempo_evento=1.0):
+            dado_fantasma=None, mensaje="", tiempo_evento=1.0,
+            duracion_evento=0.12):
     superficie.fill(config.FONDO)
     _dibujar_laberinto(superficie, partida, reproductor)
     _dibujar_actores(superficie, partida)
-    _dibujar_panel(superficie, reproductor, tiempo_evento)
+    _dibujar_panel(superficie, reproductor, tiempo_evento, duracion_evento)
     _dibujar_hud(superficie, partida, dado_jugador, dado_fantasma, mensaje)
+
+
+def dibujar_menu(superficie, visualizador_activado):
+    superficie.fill(config.FONDO)
+    lineas = (
+        ("El Laberinto del Fantasma", 54, True, 250),
+        ("Mapa fijo: laberinto 4", 30, False, 350),
+        ("V: visualizador de backtracking ["
+         + ("ACTIVADO" if visualizador_activado else "DESACTIVADO") + "]", 28, False, 415),
+        ("ENTER para comenzar", 30, False, 490),
+        ("ESC para salir", 24, False, 545),
+    )
+    for texto, tamano, negrita, y in lineas:
+        imagen = _fuente(tamano, negrita).render(texto, True, config.TEXTO)
+        superficie.blit(imagen, imagen.get_rect(center=(460, y)))
+
+
+def dibujar_final(superficie, partida):
+    capa = pygame.Surface(superficie.get_size(), pygame.SRCALPHA)
+    capa.fill((0, 0, 0, 160))
+    superficie.blit(capa, (0, 0))
+    victoria = partida.estado == partida.VICTORIA
+    mensaje = "¡HAS GANADO!" if victoria else "GAME OVER"
+    color = (50, 230, 100) if victoria else (240, 50, 50)
+    titulo = _fuente(64, True).render(mensaje, True, color)
+    superficie.blit(titulo, titulo.get_rect(center=(460, 300)))
+    subtitulo = _fuente(26).render(
+        "Turnos: " + str(partida.turno) + "   R reinicia · M / ESC menú",
+        True, config.FONDO,
+    )
+    superficie.blit(subtitulo, subtitulo.get_rect(center=(460, 360)))
 
 
 def _dibujar_laberinto(superficie, partida, reproductor):
@@ -107,7 +139,7 @@ def _dibujar_actores(superficie, partida):
         pygame.draw.circle(superficie, config.TEXTO, ojo, 2)
 
 
-def _dibujar_panel(superficie, reproductor, tiempo_evento):
+def _dibujar_panel(superficie, reproductor, tiempo_evento, duracion_evento):
     pygame.draw.rect(superficie, config.FONDO, (640, 0, 280, 640))
     titulo = _fuente(24, True).render("Pila del backtracking", True, config.TEXTO)
     superficie.blit(titulo, titulo.get_rect(center=(780, 28)))
@@ -138,7 +170,7 @@ def _dibujar_panel(superficie, reproductor, tiempo_evento):
         if (reproductor.evento_actual is not None
                 and reproductor.evento_actual.tipo == "apilar"
                 and indice == len(visibles) - 1):
-            avance = min(1.0, max(0.0, tiempo_evento / 0.12))
+            avance = min(1.0, max(0.0, tiempo_evento / duracion_evento))
             y = round(60 + (y - 60) * avance)
         _bloque(superficie, _texto_casilla(casilla, indice == 0 and not ocultos), y, color)
         if indice == len(visibles) - 1 and visibles:
@@ -146,8 +178,8 @@ def _dibujar_panel(superficie, reproductor, tiempo_evento):
 
     evento = reproductor.evento_actual
     if (evento is not None and evento.tipo == "desapilar"
-            and tiempo_evento < 0.12 and not ocultos and len(visibles) < 20):
-        avance = min(1.0, max(0.0, tiempo_evento / 0.12))
+            and tiempo_evento < duracion_evento and not ocultos and len(visibles) < 20):
+        avance = min(1.0, max(0.0, tiempo_evento / duracion_evento))
         y = round(58 - 42 * avance)
         rojo = (255, round(190 + 65 * avance), round(190 + 65 * avance))
         _bloque(superficie, _texto_casilla(evento.casilla, False), y, rojo)
@@ -184,16 +216,36 @@ def _dibujar_hud(superficie, partida, dado_jugador, dado_fantasma, mensaje):
     pygame.draw.rect(superficie, (245, 245, 245), (0, 640, 920, 100))
     pygame.draw.line(superficie, config.TARRO, (0, 640), (920, 640), 2)
     estado = mensaje or _estado(partida)
-    lineas = (
-        "Turno: " + str(partida.turno),
-        "Jugador: " + _valor_dado(dado_jugador),
-        "Fantasma: " + _valor_dado(dado_fantasma),
-        estado,
+    turno = _fuente(16, True).render(
+        "Mapa 4 · Turno: " + str(partida.turno), True, config.TEXTO,
     )
-    posiciones = ((20, 662), (190, 662), (360, 662), (20, 700))
-    for linea, posicion in zip(lineas, posiciones):
-        texto = _fuente(20).render(linea, True, config.TEXTO)
-        superficie.blit(texto, posicion)
+    superficie.blit(turno, (20, 678))
+    _dibujar_dado(superficie, 145, "Jugador", dado_jugador)
+    _dibujar_dado(superficie, 235, "Fantasma", dado_fantasma)
+    texto = _fuente(20).render(estado, True, config.TEXTO)
+    superficie.blit(texto, (330, 680))
+
+
+def _dibujar_dado(superficie, x, etiqueta, dado):
+    titulo = _fuente(16).render(etiqueta, True, config.TEXTO)
+    superficie.blit(titulo, (x, 646))
+    rect = pygame.Rect(x, 665, 60, 60)
+    pygame.draw.rect(superficie, config.FONDO, rect)
+    pygame.draw.rect(superficie, config.TEXTO, rect, 3)
+    valor = None if dado is None else (dado.cara_visible if dado.animando else dado.valor)
+    if valor not in range(1, 7):
+        return
+    puntos = {
+        1: ((1, 1),),
+        2: ((0, 0), (2, 2)),
+        3: ((0, 0), (1, 1), (2, 2)),
+        4: ((0, 0), (2, 0), (0, 2), (2, 2)),
+        5: ((0, 0), (2, 0), (1, 1), (0, 2), (2, 2)),
+        6: ((0, 0), (2, 0), (0, 1), (2, 1), (0, 2), (2, 2)),
+    }
+    for columna, fila in puntos[valor]:
+        centro = (x + 16 + columna * 14, 681 + fila * 14)
+        pygame.draw.circle(superficie, config.TEXTO, centro, 4)
 
 
 def _estado(partida):
@@ -211,12 +263,6 @@ def _estado(partida):
         partida.DERROTA: "GAME OVER",
     }
     return estados.get(partida.estado, "")
-
-
-def _valor_dado(dado):
-    if dado is None or dado.valor is None:
-        return "—"
-    return str(dado.cara_visible if dado.animando else dado.valor)
 
 
 def _mensaje_evento(evento, camino):

@@ -1,5 +1,7 @@
 """Pruebas de dibujo sobre superficies sin abrir una ventana."""
 
+from types import SimpleNamespace
+
 import pygame
 
 from config import (
@@ -73,3 +75,33 @@ def test_paredes_tienen_cuatro_pixeles(registros):
                 assert max(map(len, "".join("1" if pixel else "0" for pixel in corrida).split("0"))) == 4
                 return
     raise AssertionError("El mapa de prueba no contiene paredes internas.")
+
+
+def test_dados_se_dibujan_con_borde_y_punto(registros):
+    from dibujo import dibujar
+    from juego import Partida
+
+    pygame.init()
+    superficie = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
+    partida = Partida(Laberinto(registros[0]["grid"]))
+    dado = SimpleNamespace(valor=1, cara_visible=1, animando=False)
+    dibujar(superficie, partida, dado_jugador=dado)
+
+    assert superficie.get_at((145, 665))[:3] == (0, 0, 0)
+    assert superficie.get_at((175, 695))[:3] == (0, 0, 0)
+
+
+def test_pantalla_final_oscurece_el_tablero(registros):
+    from dibujo import dibujar, dibujar_final
+    from juego import Partida
+
+    pygame.init()
+    superficie = pygame.Surface((ANCHO_VENTANA, ALTO_VENTANA))
+    partida = Partida(Laberinto(registros[0]["grid"]))
+    dibujar(superficie, partida)
+    antes = superficie.get_at((30, 50))[:3]
+    partida.estado = partida.VICTORIA
+    dibujar_final(superficie, partida)
+
+    despues = superficie.get_at((30, 50))[:3]
+    assert all(a > b for a, b in zip(antes, despues))
